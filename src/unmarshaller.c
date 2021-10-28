@@ -22,7 +22,7 @@ PyObject *read_sock(UnmarshallerObject *self, int length)
 {
 	if (self->sock == Py_None) {
 		PyObject * read_meth = PyObject_GetAttrString(self->stream, "read");
-		PyObject * result = PyObject_CallNoArgs(read_meth);
+		PyObject * result = PyObject_CallFunction(read_meth, "");
 		return result;
 	}
 	uint16_t unix_fd_list[1024];
@@ -46,6 +46,12 @@ PyObject *read_sock(UnmarshallerObject *self, int length)
 		recvmsg_args,
 		NULL
 	);
+	err = PyErr_Occurred();
+	if (err != NULL) {
+		PyObject *ptype, *pvalue, *ptraceback;
+		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+		//		BlockingIOError
+	}
 	Py_XDECREF(recvmsg);
 	Py_XDECREF(CMSG_LEN);
 
